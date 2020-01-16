@@ -2,7 +2,7 @@ import socket
 import json
 
 
-class Host(object):
+class Host:
 
     def __inti__(self, logger, sock=None, **kwargs):
         self.target_ip = kwargs["target_ip"]

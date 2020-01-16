@@ -25,7 +25,7 @@ class CardRanks(Enum):
     Ace = 'A'
 
 
-class Card(object):
+class Card:
     def __init__(self, rank, card_type):
         self.rank = rank
         self.type = card_type
@@ -33,8 +33,8 @@ class Card(object):
     def __str__(self):
         return f"{self.rank}{self.type}"
 
-    def _is_valid_operand(self, other):
-        return isinstance(other, Card)
+    def _is_valid_operand(self, operand):
+        return isinstance(operand, Card)
 
     def __eq__(self, other):
         if self._is_valid_operand(other): raise NotImplemented
@@ -44,7 +44,7 @@ class Card(object):
         if self._is_valid_operand(other): raise NotImplemented
         return self.rank > other.rank
 
-    def __ge__(self,other):
+    def __ge__(self, other):
         if self._is_valid_operand(other): raise NotImplemented
         return self.rank >= other.rank
 
