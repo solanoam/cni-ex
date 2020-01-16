@@ -4,8 +4,8 @@ from Card import Card
 
 
 class CardGameDealer(Host):
-    def __init__(self, sock, **kwargs):
-        super().__init__(self, sock, **kwargs)
+    def __init__(self, logger, sock, **kwargs):
+        super().__init__(self, logger, sock, **kwargs)
         self.deck = Deck(self.logger)
         self.round = 0
         self.player_earnings = 0
@@ -15,7 +15,7 @@ class CardGameDealer(Host):
         self.bet = 0
 
     def play_game(self):
-        while len(self.deck) > 0:
+        while len(self.deck) >= 0:
             self.round += 1
             self.handle_game_turn()
         self.logger.info("game concluded")
@@ -28,7 +28,7 @@ class CardGameDealer(Host):
             end_of_round_msg = self.build_end_of_round_msg(winner)
             self.send_msg_to_player(end_of_round_msg)
         else:
-            self.tie = False
+            self.tie = True
 
     def handle_dealer_turn(self):
         self.dealer_card = self.deck.draw_card()
@@ -85,8 +85,8 @@ class CardGameDealer(Host):
         return self.receive()
 
     def parse_player_bet(self, player_msg):
-        card_str = player_msg['player_bet']
-        return Card(card_str[:-1], card_str[-1:])
+        bet = player_msg['player_bet']
+        return bet
 
     def is_game_terminated_by_player(self, player_msg):
         return player_msg.get('terminate')

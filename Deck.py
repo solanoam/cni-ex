@@ -2,12 +2,12 @@ import random
 from Card import CardRanks, CardTypes, Card
 
 
-class Deck(object):
+class Deck:
 
     def __init__(self, logger):
+        self.logger = logger
         self.cards = self.create_deck()
         self.index = 51
-        self.logger = logger
         self.shuffle_deck()
 
     def __len__(self):
@@ -22,15 +22,15 @@ class Deck(object):
         return cards
 
     def shuffle_deck(self):
-        self.cards = random.shuffle(self.cards)
+        random.shuffle(self.cards)
         self.logger.info("deck was shuffled")
 
     def draw_card(self):
-        if self.index > 0:
+        if self.index >= 0:
             self.index -= 1
             return self.cards[self.index + 1]
         else:
             raise AttributeError("The Deck is out of cards!")
 
     def destroy_deck(self):
-        self.index = 0
+        self.index = -1
