@@ -28,13 +28,14 @@ class CardGamePlayer(Host):
 
     def handle_player_turn(self):
         msg = self.await_response_from_dealer()
+        if self.is_start_game_failed(msg):
+            return self.handle_game_denial()
         given_card = self.parse_dealer_bet_request(msg)
         player_msg = self.ask_for_player_bet(given_card)
         self.send_msg_to_dealer(player_msg)
 
         # what did you mean here?
-        if self.is_start_game_failed(dealer_msg):
-            return self.handle_game_deny_message()
+
 
     def handle_tie(self):
         # logic for tie
@@ -77,11 +78,12 @@ class CardGamePlayer(Host):
             except ValueError:
                 self.logger.warning("This amount is not valid, try again:")
 
-    def is_start_game_failed(self, dealer_msg):
-        return dealer_msg.get('game deny')
+    def is_start_game_failed(self, msg):
+        return msg.get('game_deny')
 
-    def handle_game_deny_message(self):
-        pass
+    def handle_game_denial(self):
+        self.logger(f"the server isn't available for anymore games, closing...")
+        exit(1)
 
     def is_tie(self, msg):
         return msg.get('tie')
