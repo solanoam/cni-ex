@@ -34,9 +34,6 @@ class CardGamePlayer(Host):
         player_msg = self.ask_for_player_bet(given_card)
         self.send_msg_to_dealer(player_msg)
 
-        # what did you mean here?
-
-
     def handle_tie(self):
         # logic for tie
         pass
