@@ -27,7 +27,7 @@ class Server(Host):
         self.add_game_thread(connection_params)
 
     def start_game(self, connection_params):
-        CardGameDealer(self.socket, self.logger, **connection_params).play_game()
+        CardGameDealer(self.logger, self.socket, **connection_params).play_game()
 
 ip = "0.0.0.0"
 port = 7000
