@@ -35,8 +35,11 @@ class CardGamePlayer(Host):
         self.send_msg_to_dealer(player_msg)
 
     def handle_tie(self):
-        # logic for tie
-        pass
+        self.logger.info("Do you wish to surrender or go to war?")
+        user_input = input()
+        self.send_msg_to_dealer(user_input)
+        
+        #pass
 
     def ask_for_player_bet(self, given_card):
         self.logger.info(f"Your Card is {given_card}.")
