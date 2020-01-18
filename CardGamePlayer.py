@@ -35,11 +35,28 @@ class CardGamePlayer(Host):
         self.send_msg_to_dealer(player_msg)
 
     def handle_tie(self):
+        user_input = self.handle_tie_prompt()
+        tie_msg = self.build_player_tie_msg(user_input)
+        self.send_msg_to_dealer(tie_msg)
+
+    def handle_tie_prompt(self):
         self.logger.info("Do you wish to surrender or go to war?")
-        user_input = input()
-        self.send_msg_to_dealer(user_input)
-        
-        #pass
+        user_input = self.handle_tie_input()
+        return user_input
+
+    def handle_tie_input(self):
+        while True:
+            self.logger.info(" # Y - Yes # N - No #")
+            user_input = input()
+
+            if user_input == "Y":
+                return True
+
+            elif user_input == "N":
+                return False
+
+            else:
+                self.logger.info("Please choose a valid option:")
 
     def ask_for_player_bet(self, given_card):
         self.logger.info(f"Your Card is {given_card}.")
@@ -47,19 +64,19 @@ class CardGamePlayer(Host):
 
     def handle_player_bet_prompt(self):
         self.logger.info("What Should your respond to the dealer?")
-        user_input = self.await_user_bet_input()
+        user_input = self.handle_user_bet_input()
         if self.is_terminated:
             self.handle_game_termination()
         return self.build_player_bet_msg(user_input)
 
-    def await_user_bet_input(self):
+    def handle_user_bet_input(self):
         while True:
 
             self.logger.info("# B-Bet # T-Terminate # ")
             user_input = input()
 
             if user_input == 'B':
-                return self.await_user_bet_amount()
+                return self.handle_user_bet_amount()
 
             elif user_input == 'T':
                 self.is_terminated = True
@@ -68,7 +85,7 @@ class CardGamePlayer(Host):
             else:
                 self.logger.info("Please choose a valid option:")
 
-    def await_user_bet_amount(self):
+    def handle_user_bet_amount(self):
         self.logger.info("Please insert your bet amount:")
         while True:
             user_input = input()
@@ -90,6 +107,9 @@ class CardGamePlayer(Host):
 
     def build_player_bet_msg(self, player_bet):
         return {"player_bet": str(player_bet)}
+
+    def build_player_tie_msg(self, is_tie):
+        return {"tie_decision": is_tie}
 
     def parse_dealer_bet_request(self, msg):
         card = msg["player_card"]

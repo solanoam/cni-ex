@@ -100,7 +100,11 @@ class CardGameDealer(Host):
         return {"player_earnings": self.player_earnings, "round": self.round, "termination": True}
 
     def build_tie_msg(self):
-        return {"The result of round": str(self.round) , "is a tie!" ,"Dealer’s card": str(self.dealer_card) ,"Player’s card": str (self.player_card), "The bet": str(self.bet) }
+        return {"round": str(self.round), "tie": True, "dealer_card": str(self.dealer_card), "player_card": str (self.player_card), "bet": str(self.bet)}
+
+    # def build_tie_msg(self):
+    #     # does not compile, what did you mean here?
+    #     return {"The result of round": str(self.round) , "is a tie!" ,"Dealer’s card": str(self.dealer_card) ,"Player’s card": str (self.player_card), "The bet": str(self.bet) }
          
 
     def build_player_card_msg(self, player_card):
