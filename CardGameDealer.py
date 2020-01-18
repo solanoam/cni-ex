@@ -1,7 +1,5 @@
 from Host import Host
 from Deck import Deck
-from Card import Card
-
 
 class CardGameDealer(Host):
     def __init__(self, logger, sock, **kwargs):
@@ -61,6 +59,8 @@ class CardGameDealer(Host):
 
     def handle_tie(self):
         self.tie = True
+        tie_msg = self.build_tie_msg()
+        self.send_msg_to_player(tie_msg)
         player_tie_msg = self.await_player_turn_response()
         player_tie_decision = self.parse_tie_decision(player_tie_msg)
         if player_tie_decision == 'war':
@@ -85,11 +85,10 @@ class CardGameDealer(Host):
         return self.receive()
 
     def parse_player_bet(self, player_msg):
-        bet = player_msg['player_bet']
-        return bet
+        return player_msg['player_bet']
 
     def is_game_terminated_by_player(self, player_msg):
-        return player_msg.get('terminate')
+        return player_msg['terminate']
 
     def build_end_of_round_msg(self, winner):
         return {"dealer_card": str(self.dealer_card), "player_card": str(self.player_card), "bet": self.bet, "round": self.round, "winner": winner}
@@ -99,6 +98,14 @@ class CardGameDealer(Host):
 
     def build_termination_msg(self):
         return {"player_earnings": self.player_earnings, "round": self.round, "termination": True}
+
+    def build_tie_msg(self):
+        return {"round": str(self.round), "tie": True, "dealer_card": str(self.dealer_card), "player_card": str (self.player_card), "bet": str(self.bet)}
+
+    # def build_tie_msg(self):
+    #     # does not compile, what did you mean here?
+    #     return {"The result of round": str(self.round) , "is a tie!" ,"Dealer’s card": str(self.dealer_card) ,"Player’s card": str (self.player_card), "The bet": str(self.bet) }
+         
 
     def build_player_card_msg(self, player_card):
         return {"player_card": str(player_card)}

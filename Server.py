@@ -1,11 +1,12 @@
 import threading
-import sys
 from CardGameDealer import CardGameDealer
 from Host import Host
-from Logger import Logger, LoggingLevel
+from Logger import Logger
+from ServerOptions import server_params, logging_level
+
 
 class Server(Host):
-    def __inti__(self, logger, sock=None, **kwargs):
+    def __init__(self, logger, sock=None, **kwargs):
         super().__init__(self, **kwargs)
         self.threads = [None, None]
 
@@ -27,29 +28,7 @@ class Server(Host):
         self.add_game_thread(connection_params)
 
     def start_game(self, connection_params):
-        CardGameDealer(self.socket, self.logger, **connection_params).play_game()
+        CardGameDealer(self.logger, self.socket, **connection_params).play_game()
 
-ip = "0.0.0.0"
-port = 7000
-pack_size = 1024
-log_level = LoggingLevel.DEBUG.value
 
-if len(sys.argv) is not 4:  # check the number of arguments sent by user is correct
-    print('''
-          not enough variables.
-          please try again and insert 3 variables.
-          ''')
-    exit(-1)
-else:
-    argv_obj = {"a_or_b": sys.argv[1], "partner_ip": sys.argv[2], "m_ip_addr": sys.argv[3]}  # initialize variables
-    if argv_obj["a_or_b"] is 'a':
-        local_port = 6000
-    if argv_obj["a_or_b"] is 'b':
-        local_port = 5000
-
-server_params = {
-    "target_ip": "127.0.0.1",
-    "target_port": 3301,
-    "pack_size": 1024
-}
-Server(Logger(1), **server_params).await_game_requests()
+Server(Logger(logging_level), **server_params).await_game_requests()
