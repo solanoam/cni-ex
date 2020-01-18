@@ -8,7 +8,7 @@ class LoggingLevel(Enum):
     ERROR = 4
     EXCEPTION = 5
 
-class Logger(object):
+class Logger:
     def __init__(self, log_level):
         self.log = print
         self.log_level = log_level
@@ -21,8 +21,7 @@ class Logger(object):
         now = self.now_datetime()
         self._log_msg(msg, now, log_level)
 
-    @staticmethod
-    def now_datetime():
+    def now_datetime(self):
         return datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
 
     def debug(self, msg):

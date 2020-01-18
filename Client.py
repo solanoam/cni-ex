@@ -1,5 +1,8 @@
 from CardGamePlayer import CardGamePlayer
+from ClientOptions import logging_level, client_params
 from Host import Host
+from Logger import Logger
+
 
 class Client(Host):
     def __init__(self, logger, sock, **kwargs):
@@ -14,3 +17,6 @@ class Client(Host):
             "target_port": self.target_port,
             "pack_size": self.pack_size
         }
+
+
+Client(Logger(logging_level), **client_params).init_game()
