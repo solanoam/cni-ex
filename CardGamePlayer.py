@@ -3,13 +3,18 @@ from Card import Card
 
 
 class CardGamePlayer(Host):
-    def __init__(self, logger, sock, **kwargs):
-        super().__init__(self, logger, sock, **kwargs)
+    def __init__(self, logger, **kwargs):
+        super().__init__(self, logger, **kwargs)
         self.player_bet = 0
         self.player_card = None
         self.dealer_card = None
         self.tie = False
         self.is_terminated = False
+
+    def init_game(self):
+        msg = self.build_init_msg()
+        self.send_msg_to_dealer(msg)
+        self.play_game()
 
     def play_game(self):
         while not self.is_terminated:
@@ -28,8 +33,6 @@ class CardGamePlayer(Host):
 
     def handle_player_turn(self):
         msg = self.await_response_from_dealer()
-        if self.is_start_game_failed(msg):
-            return self.handle_game_denial()
         given_card = self.parse_dealer_bet_request(msg)
         player_msg = self.ask_for_player_bet(given_card)
         self.send_msg_to_dealer(player_msg)
@@ -95,13 +98,6 @@ class CardGamePlayer(Host):
             except ValueError:
                 self.logger.warning("This amount is not valid, try again:")
 
-    def is_start_game_failed(self, msg):
-        return msg.get('game_deny')
-
-    def handle_game_denial(self):
-        self.logger(f"the server isn't available for anymore games, closing...")
-        exit(1)
-
     def is_tie(self, msg):
         return msg.get('tie')
 
@@ -133,3 +129,6 @@ class CardGamePlayer(Host):
 
     def send_msg_to_dealer(self, msg):
         self.transmit(msg)
+
+    def build_init_msg(self):
+        return {"init_game": True}
