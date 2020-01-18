@@ -2,8 +2,8 @@ from Host import Host
 from Deck import Deck
 
 class CardGameDealer(Host):
-    def __init__(self, logger, sock, **kwargs):
-        super().__init__(self, logger, sock, **kwargs)
+    def __init__(self, logger, **kwargs):
+        super().__init__(self, logger, True, **kwargs)
         self.deck = Deck(self.logger)
         self.round = 0
         self.player_earnings = 0
@@ -11,6 +11,10 @@ class CardGameDealer(Host):
         self.player_card = None
         self.dealer_card = None
         self.bet = 0
+
+    def init_game(self):
+        self.await_player_turn_response()
+        self.play_game()
 
     def play_game(self):
         while len(self.deck) >= 0:
@@ -105,7 +109,6 @@ class CardGameDealer(Host):
     # def build_tie_msg(self):
     #     # does not compile, what did you mean here?
     #     return {"The result of round": str(self.round) , "is a tie!" ,"Dealer’s card": str(self.dealer_card) ,"Player’s card": str (self.player_card), "The bet": str(self.bet) }
-         
 
     def build_player_card_msg(self, player_card):
         return {"player_card": str(player_card)}
