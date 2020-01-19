@@ -1,4 +1,4 @@
-from Logger import LoggingLevel
+from src.Logger import LoggingLevel
 
 server_params = {
     "ip": "127.0.0.1",

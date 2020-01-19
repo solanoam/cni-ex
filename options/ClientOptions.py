@@ -1,4 +1,4 @@
-from Logger import LoggingLevel
+from src.Logger import LoggingLevel
 
 logging_level = LoggingLevel.DEBUG.value
 client_params = {
