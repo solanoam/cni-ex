@@ -4,11 +4,11 @@ from Card import Card
 
 class CardGamePlayer(Host):
     def __init__(self, logger, **kwargs):
-        super().__init__(self, logger, **kwargs)
+        super().__init__(logger, **kwargs)
+        self.init_socket()
         self.player_bet = 0
         self.player_card = None
         self.dealer_card = None
-        self.tie = False
         self.is_terminated = False
 
     def init_game(self):
@@ -24,26 +24,34 @@ class CardGamePlayer(Host):
         self.handle_player_turn()
         dealer_msg = self.await_response_from_dealer()
         if self.is_tie(dealer_msg):
-            self.handle_tie()
+            return self.handle_tie(dealer_msg)
         self.prompt_round_outcome(dealer_msg)
 
     def prompt_round_outcome(self, msg):
         self.logger.info(f"the outcome for this round: {msg['round']}")
-        self.logger.info(f"winner is {msg['winner']} with a bet of {msg['bet']}, player card - {msg['player_card']}, dealer card - {msg['dealer_card']}:")
+        self.logger.info(f"winner is {msg['winner']} with a bet of {msg['bet']} { '(original bet was ' + str(int(msg['original_bet'])) + ')' if msg.get('original_bet') else ''}, player card - {msg['player_card']}, dealer card - {msg['dealer_card']}:")
 
     def handle_player_turn(self):
         msg = self.await_response_from_dealer()
+        if self.is_game_terminated(msg):
+            self.prompt_termination_msg(msg)
+            exit(1)
         given_card = self.parse_dealer_bet_request(msg)
         player_msg = self.ask_for_player_bet(given_card)
         self.send_msg_to_dealer(player_msg)
 
-    def handle_tie(self):
-        user_input = self.handle_tie_prompt()
+    def handle_tie(self, dealer_tie_msg):
+        user_input = self.handle_tie_prompt(dealer_tie_msg)
         tie_msg = self.build_player_tie_msg(user_input)
         self.send_msg_to_dealer(tie_msg)
+        if not user_input:
+            self.logger.info(f"not going to war and moving to the next round")
+        msg = self.await_response_from_dealer()
+        return self.prompt_round_outcome(msg)
 
-    def handle_tie_prompt(self):
-        self.logger.info("Do you wish to surrender or go to war?")
+    def handle_tie_prompt(self, dealer_tie_msg):
+        self.logger.info(f"its a tie. Dealer Card: {dealer_tie_msg['dealer_card']}, Player Card: {dealer_tie_msg['player_card']}")
+        self.logger.info("Do you wish to go to war?")
         user_input = self.handle_tie_input()
         return user_input
 
@@ -52,10 +60,10 @@ class CardGamePlayer(Host):
             self.logger.info(" # Y - Yes # N - No #")
             user_input = input()
 
-            if user_input == "Y":
+            if self.validate_input(user_input, "Y"):
                 return True
 
-            elif user_input == "N":
+            elif self.validate_input(user_input, "N"):
                 return False
 
             else:
@@ -78,10 +86,10 @@ class CardGamePlayer(Host):
             self.logger.info("# B-Bet # T-Terminate # ")
             user_input = input()
 
-            if user_input == 'B':
+            if self.validate_input(user_input, "B"):
                 return self.handle_user_bet_amount()
 
-            elif user_input == 'T':
+            elif self.validate_input(user_input, "T"):
                 self.is_terminated = True
                 return "T"
 
@@ -97,6 +105,9 @@ class CardGamePlayer(Host):
                 return user_input_value
             except ValueError:
                 self.logger.warning("This amount is not valid, try again:")
+
+    def validate_input(self, input: str, correnct_input):
+        return bool(input.capitalize() == correnct_input or input.lower() == correnct_input)
 
     def is_tie(self, msg):
         return msg.get('tie')
@@ -121,7 +132,7 @@ class CardGamePlayer(Host):
         exit(1)
 
     def prompt_termination_msg(self, msg):
-        self.logger.info(f"The dealer has confirmed your termination.")
+        self.logger.info(f"The dealer has ended your game.")
         self.logger.info(f"We have ended our match on round {msg['round']} with earnings of {msg['player_earnings']}")
 
     def await_response_from_dealer(self):
@@ -129,6 +140,9 @@ class CardGamePlayer(Host):
 
     def send_msg_to_dealer(self, msg):
         self.transmit(msg)
+
+    def is_game_terminated(self, msg):
+        return msg.get("termination")
 
     def build_init_msg(self):
         return {"init_game": True}

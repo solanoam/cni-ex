@@ -18,12 +18,12 @@ class Deck:
         for rank in CardRanks:
             for card_type in CardTypes:
                 cards.append(Card(rank.value, card_type.value))
-        self.logger.info("deck was created")
+        self.logger.debug("deck was created")
         return cards
 
     def shuffle_deck(self):
         random.shuffle(self.cards)
-        self.logger.info("deck was shuffled")
+        self.logger.debug("deck was shuffled")
 
     def draw_card(self):
         if self.index >= 0:
