@@ -14,15 +14,15 @@ class Logger:
         self.log_level = log_level
 
     def _log_msg(self, msg, now, prefix):
-        self.log(f"[{now}]{prefix} - {msg}")
+        self.log(f"[{now}][{prefix}] - {msg}")
 
     def _log_msg_hierarchy(self, msg, log_level):
-        if self.log_level < LoggingLevel[log_level]: return
+        if self.log_level > LoggingLevel[log_level].value: return
         now = self.now_datetime()
         self._log_msg(msg, now, log_level)
 
     def now_datetime(self):
-        return datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
+        return datetime.datetime.now().strftime("%I:%M:%S.%f %p on %B %d, %Y")
 
     def debug(self, msg):
         self._log_msg_hierarchy(msg, "DEBUG")
