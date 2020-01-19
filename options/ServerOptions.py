@@ -1,4 +1,11 @@
-from Logger import LoggingLevel
+"""
+Written by
+Noam Solan - 204484703
+Yarin Kimhi - 308337641
+repo - https://github.com/solanoam/cni-ex
+"""
+
+from src.Logger import LoggingLevel
 
 server_params = {
     "ip": "127.0.0.1",
